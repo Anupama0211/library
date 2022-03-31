@@ -1,4 +1,4 @@
-package com.epam.books.dto;
+package com.epam.books.dtos;
 
 
 import lombok.Getter;

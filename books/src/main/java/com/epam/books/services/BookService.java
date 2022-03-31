@@ -1,7 +1,7 @@
-package com.epam.books.service;
+package com.epam.books.services;
 
-import com.epam.books.dto.BookDto;
-import com.epam.books.entity.Book;
+import com.epam.books.dtos.BookDto;
+import com.epam.books.entities.Book;
 import com.epam.books.repository.BookRepository;
 import com.epam.books.exceptions.NoBookFoundException;
 import org.modelmapper.ModelMapper;
@@ -45,9 +45,9 @@ public class BookService {
                         , BookDto.class);
     }
 
-    public BookDto modifyQuestion(BookDto bookDto, int bookId) {
-        Optional<Book> questionOptional = bookRepository.findById(bookId);
-        if (questionOptional.isPresent()) {
+    public BookDto updateBook(BookDto bookDto, int bookId) {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
+        if (bookOptional.isPresent()) {
             bookDto.setId(bookId);
             return addBook(bookDto);
         } else {

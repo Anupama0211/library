@@ -1,11 +1,9 @@
-package com.epam.books.entity;
+package com.epam.books.entities;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Setter
 @Getter
@@ -13,7 +11,9 @@ import javax.persistence.Table;
 @Table(name = "books")
 public class Book {
     @Id
-    int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "book_id")
+    int bookId;
     String name;
     String publisher;
     String author;
