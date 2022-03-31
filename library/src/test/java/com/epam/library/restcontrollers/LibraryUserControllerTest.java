@@ -16,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
@@ -23,8 +25,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(LibraryUserController.class)
 class LibraryUserControllerTest {
@@ -47,11 +49,15 @@ class LibraryUserControllerTest {
 
     @Test
     void getAllUsers() throws Exception {
-        when(userClient.getAllUsers()).thenReturn(List.of(new UserDto()));
+
+        List<UserDto> response = List.of(new UserDto());
+        when(userClient.getAllUsers()).thenReturn(response);
         mockMvc.perform(get("/library/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
-
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
+        ;
         when(userClient.getAllUsers()).thenThrow(FeignException.class);
         mockMvc.perform(get("/library/users"))
                 .andExpect(status().isNotFound());
@@ -90,7 +96,6 @@ class LibraryUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isCreated());
-
 
         userDto.setName("");
         mockMvc.perform(post("/library/users")

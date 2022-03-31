@@ -68,10 +68,14 @@ class LibraryServiceTest {
         when(libraryRepository.save(any(Library.class))).thenReturn(library);
 
         libraryService.issueABookToAUser("Anupama", 1);
+
         verify(libraryRepository).save(libraryArgumentCaptor.capture());
+
         Library argumentCaptorValue = libraryArgumentCaptor.getValue();
+
         assertThat(argumentCaptorValue.getBookId()).isEqualTo(1);
         assertThat(argumentCaptorValue.getUserName()).isEqualTo("Anupama");
+
         when(libraryRepository.findByUserName("Anupama")).thenReturn(List.of(library, library, library));
         assertThrows(MaxBooksIssuedException.class, () -> libraryService.issueABookToAUser("Anupama", 1));
     }
