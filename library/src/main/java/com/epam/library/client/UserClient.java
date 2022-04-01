@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "userservice", url = "http://localhost:8081")
+@FeignClient(name = "user-service")
 public interface UserClient {
 
     @GetMapping("users")
