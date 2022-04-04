@@ -39,8 +39,6 @@ class LibraryControllerTest {
         when(libraryService.issueABookToAUser(anyString(), anyInt())).thenThrow(MaxBooksIssuedException.class);
         mockMvc.perform(post("/library/users/Anupama/books/1")).andExpect(status().isBadRequest());
 
-//        when(libraryService.issueABookToAUser("Anupama", 1)).thenThrow(SQLIntegrityConstraintViolationException.class);
-//        mockMvc.perform(post("/library/users/Anupama/books/1")).andExpect(status().isNotFound());
 
     }
 
