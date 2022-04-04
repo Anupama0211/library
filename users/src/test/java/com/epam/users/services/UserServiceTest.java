@@ -70,7 +70,7 @@ class UserServiceTest {
 
     @Test
     void removeUser() {
-       userService.removeUser("Anu02");
+        userService.removeUser("Anu02");
         verify(userRepository).deleteById("Anu02");
     }
 
@@ -83,6 +83,7 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserById("Anu02"));
     }
 
+
     @Test
     void updateUser() {
 
@@ -90,11 +91,11 @@ class UserServiceTest {
         when(modelMapper.map(userDto, User.class)).thenReturn(user);
         when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
         when(userRepository.findById("Anu02")).thenReturn(Optional.ofNullable(user));
-        assertThat(userService.updateUser(userDto,"Anu02")).isEqualTo(userDto);
+        assertThat(userService.updateUser(userDto, "Anu02")).isEqualTo(userDto);
         verify(userRepository).save(user);
         when(userRepository.findById("Anu02")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(userDto,"Anu02"));
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser(userDto, "Anu02"));
         user.setUserName("Anupama");
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(userDto,"Anu02"));
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser(userDto, "Anu02"));
     }
 }
