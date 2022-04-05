@@ -1,12 +1,14 @@
 package com.epam.library.client;
 
 import com.epam.library.dtos.BookDto;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "book-service")
+@LoadBalancerClient(name="book-service")
+@FeignClient(name = "book-service",fallback = BookClientImpl.class)
 public interface BookClient {
 
     @GetMapping("books")
