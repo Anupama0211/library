@@ -6,6 +6,7 @@ import com.epam.library.exceptions.BookNotIssuedException;
 import com.epam.library.exceptions.MaxBooksIssuedException;
 import feign.FeignException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,9 +31,12 @@ public class MyExceptionHandler {
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
-    ResponseEntity<ExceptionResponse> handleHttpClientErrorException(HttpClientErrorException exception, WebRequest request) {
-        ExceptionResponse exceptionResponse = getExceptionResponse(exception.getMessage(), HttpStatus.NOT_FOUND, request);
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException exception, WebRequest request) {
+        String body=exception.getResponseBodyAsString();
+        HttpStatus status=exception.getStatusCode();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Content-Type", "application/json");
+        return new ResponseEntity<>(body,httpHeaders,status);
     }
 
     @ExceptionHandler(BookNotIssuedException.class)
@@ -47,11 +51,15 @@ public class MyExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(FeignException.class)
-    ResponseEntity<ExceptionResponse> handleFeignException(FeignException exception, WebRequest request) {
-        ExceptionResponse exceptionResponse = getExceptionResponse(exception.getMessage(), HttpStatus.NOT_FOUND, request);
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(value = FeignException.class)
+    protected ResponseEntity<String> handleFeignException(FeignException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.status());
+        String body = ex.contentUTF8();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Content-Type", "application/json");
+        return new ResponseEntity<>(body,httpHeaders,status);
     }
+
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     ResponseEntity<ExceptionResponse> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception, WebRequest request) {
