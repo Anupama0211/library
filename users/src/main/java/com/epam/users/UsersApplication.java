@@ -17,8 +17,6 @@ public class UsersApplication {
         SpringApplication.run(UsersApplication.class, args);
     }
 
-
-
     @Bean
     public ModelMapper getMapper() {
         return new ModelMapper();
