@@ -4,6 +4,8 @@ import com.epam.library.client.BookClient;
 import com.epam.library.client.UserClient;
 import com.epam.library.dtos.LibraryDto;
 import com.epam.library.dtos.UserDto;
+import com.epam.library.exceptions.OperationNotPerformedException;
+import com.epam.library.exceptions.SampleFeingException;
 import com.epam.library.services.LibraryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,9 +60,9 @@ class LibraryUserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(response)));
         ;
-        when(userClient.getAllUsers()).thenThrow(FeignException.class);
+        when(userClient.getAllUsers()).thenThrow(new SampleFeingException(404, ""));
         mockMvc.perform(get("/library/users"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().is(404));
 
     }
 
@@ -79,9 +81,9 @@ class LibraryUserControllerTest {
         verify(bookClient).getABook(1);
         verify(userClient).getAUser("Anupama");
 
-        when(userClient.getAUser("Anupama")).thenThrow(FeignException.class);
+        when(userClient.getAUser("Anupama")).thenThrow(new SampleFeingException(404, ""));
         mockMvc.perform(get("/library/users/Anupama"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().is(404));
     }
 
     @Test
@@ -102,6 +104,12 @@ class LibraryUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isBadRequest());
+        when(userClient.addAUser(userDto)).thenThrow(OperationNotPerformedException.class);
+        mockMvc.perform(post("/library/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isBadRequest());
+
     }
 
     @Test

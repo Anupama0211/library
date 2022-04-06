@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @LoadBalancerClient(name="book-service")
-@FeignClient(name = "book-service",fallback = BookClientImpl.class)
+@FeignClient(name = "book-service",fallbackFactory = BookClientFallBackFactory.class)
 public interface BookClient {
 
     @GetMapping("books")

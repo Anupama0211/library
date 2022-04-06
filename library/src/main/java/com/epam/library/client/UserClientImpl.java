@@ -1,35 +1,59 @@
 package com.epam.library.client;
 
 import com.epam.library.dtos.UserDto;
-import org.springframework.stereotype.Component;
+import com.epam.library.exceptions.OperationNotPerformedException;
+import feign.FeignException;
+import lombok.Setter;
 
-import javax.persistence.Column;
 import java.util.List;
 
-@Component
-public class UserClientImpl implements UserClient{
+public class UserClientImpl implements UserClient {
+
+    private static final String MESSAGE = "Operation Cannot be performed";
+    private @Setter
+    Throwable cause;
+
+    public UserClientImpl(Throwable cause) {
+        this.cause = cause;
+    }
+
     @Override
     public List<UserDto> getAllUsers() {
-        return null;
+        if (cause instanceof FeignException feignException && feignException.status() == 404) {
+            throw feignException;
+        }
+        return List.of(new UserDto());
     }
 
     @Override
     public UserDto getAUser(String userName) {
+        if (cause instanceof FeignException feignException && feignException.status() == 404) {
+            throw feignException;
+        }
         return new UserDto();
     }
 
     @Override
     public UserDto addAUser(UserDto userDto) {
-        return null;
+        if (cause instanceof FeignException feignException && feignException.status() == 400) {
+            throw feignException;
+        }
+        throw new OperationNotPerformedException(MESSAGE);
     }
 
     @Override
     public void removeAUser(String userName) {
-
+        if (cause instanceof FeignException feignException && feignException.status() == 404) {
+            throw feignException;
+        }
+        throw new OperationNotPerformedException(MESSAGE);
     }
 
     @Override
     public UserDto updateAUser(UserDto userDto, String userName) {
-        return null;
+        if (cause instanceof FeignException feignException && feignException.status() == 404) {
+            throw feignException;
+        }
+        throw new OperationNotPerformedException(MESSAGE);
     }
 }

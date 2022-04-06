@@ -19,10 +19,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -53,7 +55,7 @@ class LibraryBookControllerTest {
 
     @Test
     void getAllBooks() throws Exception {
-        ResponseEntity<List<BookDto>> response=new ResponseEntity<List<BookDto>>(List.of(new BookDto()), HttpStatus.OK);
+        ResponseEntity<List<BookDto>> response = new ResponseEntity<List<BookDto>>(List.of(new BookDto()), HttpStatus.OK);
         when(restTemplate.exchange(bookServiceUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<BookDto>>() {
         })).thenReturn(response);
         mockMvc.perform(get("/library/books"))
@@ -63,23 +65,19 @@ class LibraryBookControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(response.getBody())));
 
         when(restTemplate.exchange(bookServiceUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<BookDto>>() {
-        })).thenThrow(HttpClientErrorException.class);
+        })).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "Not Found", new byte[]{}, Charset.defaultCharset()));
         mockMvc.perform(get("/library/books"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getABook() throws Exception {
-        ResponseEntity<BookDto> response=new ResponseEntity<BookDto>(new BookDto(), HttpStatus.OK);
-        when(restTemplate.exchange(bookServiceUrl.concat("/1" ), HttpMethod.GET, null, BookDto.class)).thenReturn(response);
+        ResponseEntity<BookDto> response = new ResponseEntity<BookDto>(new BookDto(), HttpStatus.OK);
+        when(restTemplate.exchange(bookServiceUrl.concat("/1"), HttpMethod.GET, null, BookDto.class)).thenReturn(response);
         mockMvc.perform(get("/library/books/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(response.getBody())));
-
-        when(restTemplate.exchange(bookServiceUrl.concat("/1" ), HttpMethod.GET, null, BookDto.class)).thenThrow(HttpClientErrorException.class);
-        mockMvc.perform(get("/library/books/1"))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -88,8 +86,8 @@ class LibraryBookControllerTest {
         bookDto.setAuthor("ABCDE");
         bookDto.setName("12345");
         bookDto.setPublisher("Publisher");
-        ResponseEntity<BookDto> response=new ResponseEntity<BookDto>(bookDto,HttpStatus.CREATED);
-        when(restTemplate.postForEntity(anyString(), any(BookDto.class),  eq(BookDto.class))).thenReturn(response);
+        ResponseEntity<BookDto> response = new ResponseEntity<BookDto>(bookDto, HttpStatus.CREATED);
+        when(restTemplate.postForEntity(anyString(), any(BookDto.class), eq(BookDto.class))).thenReturn(response);
 
         mockMvc.perform(post("/library/books")
                         .contentType(MediaType.APPLICATION_JSON)

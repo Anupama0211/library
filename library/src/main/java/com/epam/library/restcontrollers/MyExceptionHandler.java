@@ -4,6 +4,7 @@ package com.epam.library.restcontrollers;
 import com.epam.library.dtos.ExceptionResponse;
 import com.epam.library.exceptions.BookNotIssuedException;
 import com.epam.library.exceptions.MaxBooksIssuedException;
+import com.epam.library.exceptions.OperationNotPerformedException;
 import feign.FeignException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -50,14 +51,17 @@ public class MyExceptionHandler {
         ExceptionResponse exceptionResponse = getExceptionResponse(exception.getMessage(), HttpStatus.BAD_REQUEST, request);
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(OperationNotPerformedException.class)
+    ResponseEntity<ExceptionResponse> handleOperationNotPerformedException(OperationNotPerformedException exception, WebRequest request) {
+        ExceptionResponse exceptionResponse = getExceptionResponse(exception.getMessage(), HttpStatus.BAD_REQUEST, request);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(value = FeignException.class)
     protected ResponseEntity<String> handleFeignException(FeignException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.valueOf(ex.status());
         String body = ex.contentUTF8();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Content-Type", "application/json");
-        return new ResponseEntity<>(body,httpHeaders,status);
+        return new ResponseEntity<>(body,httpHeaders,ex.status());
     }
 
 
