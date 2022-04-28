@@ -33,7 +33,6 @@ class BookClientImplTest {
 
     @Test
     void addABook() {
-
         assertThrows(OperationNotPerformedException.class, () -> bookClient.addABook(bookDto));
         bookClient.setCause(new SampleFeingException(400, ""));
         assertThrows(FeignException.class, () -> bookClient.addABook(bookDto));
